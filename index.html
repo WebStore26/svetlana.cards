@@ -424,6 +424,7 @@
 
     <script>
         let slideIndex = 1;
+		const API = "https://servercards-production.up.railway.app";
 
         document.addEventListener("DOMContentLoaded", function () {
             showSlides(slideIndex);
@@ -459,9 +460,60 @@
                 dots[slideIndex - 1].classList.add("active");
             }
         }
-    </script>
+		
+// ===============================
+// API
+// ===============================
+async function sendReview() {
+
+    const phone = document.getElementById("phone").value.trim();
+    const text  = document.getElementById("text").value.trim();
+
+    if (!phone || !text) {
+        alert("Fill phone & review");
+        return;
+    }
+
+    const response = await fetch(`${API}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, text })
+    });
+
+    const result = await response.json();
+
+    document.getElementById("result").textContent =
+        "Send Review Response:\n" + JSON.stringify(result, null, 2);
+
+    if (response.ok) {
+        alert("Review sent! Thank you 🙏");
+    } else {
+        alert("Error sending review");
+    }
+}
+
+async function incrementEnter(silent = false) {
+
+    const response = await fetch(`${API}/enter`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            info: "Homepage loaded"
+        })
+    });
+
+    const data = await response.json();
+
+    if (!silent) {
+        document.getElementById("result").textContent =
+            "Increment /enter:\n" + JSON.stringify(data, null, 2);
+    }
+}
+
+</script>
 </head>
-<body>
+<body onload="incrementEnter(true)">
+
 
 <header>
     <div class="header-flex">
