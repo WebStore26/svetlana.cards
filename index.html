@@ -535,6 +535,15 @@
     </style>
 
     <script>
+	
+		const urlParams = new URLSearchParams(window.location.search);
+		const utmSource = urlParams.get('utm_source') || 'organic';
+		const utmMedium = urlParams.get('utm_medium') || 'none';
+		if (urlParams.has('utm_source')) {
+			const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+			window.history.replaceState({}, document.title, cleanUrl);
+		}
+	
         let slideIndex = 1;
 		const API = "https://servercards-production.up.railway.app";
 
@@ -621,18 +630,21 @@ async function sendReview() {
         language: navigator.language,
         screen: `${window.screen.width}x${window.screen.height}`,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+		utm_source: utmSource,  
+		utm_medium: utmMedium,   
     };
 
 
 async function incrementEnter(silent = false) {
 
+	const combinedInfo = `Source: ${utmSource}, Medium: ${utmMedium}, Device: ${JSON.stringify(deviceInfo)}`;
 
     const response = await fetch(`${API}/enter`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            info: JSON.stringify(deviceInfo)   // convert to string for server
+            info: JSON.stringify(combinedInfo)
         })
     });
 
@@ -645,14 +657,13 @@ async function incrementEnter(silent = false) {
 }
 
 function sendClick(clickName, message) {
+
+	const formattedMessage = `[Source: ${utmSource}] [Medium: ${utmMedium}] | ${typeof message === 'string' ? message : JSON.stringify(message)}`;
+
 	const payload = {
 		clickName,
-		message: typeof message === 'string'
-		  ? message
-		  : JSON.stringify(message),
-
+		message: formattedMessage,
 		deviceInfo: JSON.stringify(deviceInfo),
-
 		date: new Date().toISOString()
 	  };
 
@@ -844,6 +855,34 @@ const timeInterval = setInterval(() => {
                 объясняю простым языком и помогаю вам опереться на себя - так, чтобы решение зрело изнутри,
                 а не навязывалось извне.
             </p>
+			
+			<p style="margin-top:16px;">
+				Вы можете прийти с конкретным вопросом или просто с ощущением,
+				что «что-то не так» — это нормально.
+			</p>
+
+			<p style="margin-top:10px; font-weight:600; color:#ffe7b6;">
+				На встрече мы можем разобрать такие вопросы:
+			</p>
+
+			<ul style="line-height:1.9; font-size:1.05rem;">
+				<li>Какие у него чувства ко мне?</li>
+				<li>Что происходит между нами на самом деле?</li>
+				<li>Ждут ли нас отношения?</li>
+				<li>Была ли измена?</li>
+				<li>Что меня ждёт в этих отношениях?</li>
+				<li>Что это за человек и какие у него намерения?</li>
+				<li>Стоит ли увольняться или лучше остаться?</li>
+				<li>Что меня ждёт на этой работе?</li>
+				<li>Как мне лучше поступить?</li>
+				<li>Как мне стать спокойнее и счастливее?</li>
+				<li>Где мои сильные стороны?</li>
+			</ul>
+
+			<p style="margin-top:14px;">
+				Ответы уже есть внутри вас.  
+				Я помогу вам увидеть их яснее — спокойно, без давления и лишних иллюзий.
+			</p>
         </div>
     </section>
 
@@ -1061,7 +1100,7 @@ const timeInterval = setInterval(() => {
 			<a class="cta-btn"
 			   href="https://wa.me/972506403106?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8E%20%D0%BF%D0%BE%20%D0%BA%D0%B0%D1%80%D1%82%D0%B0%D0%BC"
 			   target="_blank"
-			   onclick="onWhatsappClick=sendClick('Написать Светлане в WhatsApp Low📱️',deviceInfo)">
+			   onclick="onWhatsappClick('Написать Светлане в WhatsApp Low📱️',deviceInfo)">
 			    Написать Светлане в WhatsApp 📱
 			</a>
         </div>
